@@ -1,27 +1,38 @@
 import numpy as np
 import pandas as pd
 import sys
-
+import kmeans
 def kMeans_pp(dataPoints, k, epsilon, iter=300 ):
+    
+    
+    dataPoints_array = np.array(dataPoints)
     centroids = []
-    n = len(dataPoints)
+    n = len(dataPoints_array)
+    
     distances = np.zeros(n)
-    centroids.append({'center': dataPoints[np.random.choice(n)].copy(), 'currentCenter': [0]*len(dataPoints[0]), 'size': 0})
+    centroids.append(dataPoints_array[np.random.choice(n)].copy())
+    
     for _ in range(k-1):
         index = 0
-        for point in dataPoints:
+        for point in dataPoints_array:
             distances[index] = findClosestCenter(point,centroids)
             index += 1
+            
         probabilities  = distances / distances.sum()
         next_centroid = np.random.choice(n,p = probabilities)
-        centroids.append({'center': dataPoints[next_centroid].copy(), 'currentCenter': [0]*len(dataPoints[0]), 'size': 0})
-    print(centroids)
+        centroids.append(dataPoints_array[next_centroid].copy())
+    
+    centroids_array = np.array(centroids)
+    centroids_array = centroids_array.tolist()
+    dataPoints_array = dataPoints_array.tolist()
+    c = kmeans.fit(centroids_array, dataPoints_array, iter, epsilon)
+    print(c)
         
 
 def findClosestCenter(datapoint, centroids):
-    minDistance = calcEclideanDistance(np.array(centroids[0]['center']), datapoint[1])
+    minDistance = calcEclideanDistance(np.array(centroids[0]), datapoint[1])
     for u in enumerate(centroids):
-        distance = calcEclideanDistance(u[1]['center'], datapoint[1])
+        distance = calcEclideanDistance(u[1], datapoint[1])
         if(distance < minDistance):
             minDistance = distance
     return minDistance
@@ -34,7 +45,7 @@ def parseArgs(args):
         iter = 300
         filePath1 = args[3]
         filePath2 = args[4]
-        epsilon = args[2]
+        epsilon = float(args[2])
     if len(args) == 6:
         try:
             iter = int(args[2])
@@ -45,7 +56,7 @@ def parseArgs(args):
             exit()
         filePath1 = args[4]
         filePath2 = args[5]
-        epsilon = args[3]
+        epsilon = float(args[3])
         
     df1 = pd.read_csv(filePath1, header=None)
     df2 = pd.read_csv(filePath2, header=None)
