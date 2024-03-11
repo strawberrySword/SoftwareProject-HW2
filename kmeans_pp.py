@@ -4,23 +4,22 @@ import sys
 import kmeans
 
 def kMeans_pp(dataPoints, k, epsilon, iter=300 ):
-    dataPoints_array = np.array(dataPoints)
     centroids = []
-    n = len(dataPoints_array)
     
+    n = len(dataPoints)
     distances = np.zeros(n)
     np.random.seed(0)
-    centroids.append(dataPoints_array[np.random.choice(n)].copy())
+    centroids.append(dataPoints[np.random.choice(n)].copy())
     
     for _ in range(k-1):
         index = 0
-        for point in dataPoints_array:
+        for point in dataPoints:
             distances[index] = findClosestCenter(point,centroids)
             index += 1
             
         probabilities  = distances / distances.sum()
         next_centroid = np.random.choice(n,p = probabilities)
-        centroids.append(dataPoints_array[next_centroid].copy())
+        centroids.append(dataPoints[next_centroid].copy())
     
     centroids_array = np.array(centroids)
     centroids_array = centroids_array.tolist() 
@@ -30,9 +29,9 @@ def kMeans_pp(dataPoints, k, epsilon, iter=300 ):
         
 
 def findClosestCenter(datapoint, centroids):
-    minDistance = calcEclideanDistance(np.array(centroids[0]), datapoint[1])
-    for u in enumerate(centroids):
-        distance = calcEclideanDistance(u[1], datapoint[1])
+    minDistance = calcEclideanDistance(centroids, datapoint)
+    for u in centroids:
+        distance = calcEclideanDistance(u, datapoint)
         if(distance < minDistance):
             minDistance = distance
     return minDistance
@@ -45,7 +44,14 @@ def parseArgs(args):
         iter = 300
         filePath1 = args[3]
         filePath2 = args[4]
-        epsilon = float(args[2])
+        try:
+            epsilon = float(args[2])
+            if not(epsilon >= 0):
+                exit()
+        except: 
+            print("Invalid epsilon!")
+            exit()
+        
     if len(args) == 6:
         try:
             iter = int(args[2])
@@ -57,6 +63,13 @@ def parseArgs(args):
         filePath1 = args[4]
         filePath2 = args[5]
         epsilon = float(args[3])
+        try:
+            epsilon = float(args[2])
+            if not(epsilon >= 0):
+                exit()
+        except: 
+            print("Invalid epsilon!")
+            exit()
         
     df1 = pd.read_csv(filePath1, header=None)
     df2 = pd.read_csv(filePath2, header=None)
@@ -91,26 +104,26 @@ def parseArgs(args):
 
 if __name__ == '__main__':
     k, iter, list, index_list, epsilon, filePath1, filePath2 = parseArgs(sys.argv)
-    # try:
-    init_centroids = kMeans_pp(list, k, epsilon, iter)
-    dataPoints_array = list.tolist()
-    # print(index_list)
-    
-    centroidIndices = []
-    
-    for centroid in init_centroids: 
-        for index, dataPoint in enumerate(list):
-            if(np.array_equal(centroid,dataPoint)):
-                print(index)
-                centroidIndices.append(index)
-                
-    print(centroidIndices)
-    c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
-    
-    for u in c:
-        formatted = [ '%.4f' % elem for elem in u ]
-        print(','.join(formatted))
-    # except:
-    print("An Error Has Occurred")
-    exit()
+    try:
+        init_centroids = kMeans_pp(list, k, epsilon, iter)
+        dataPoints_array = list.tolist()     
+        centroidIndices = []
+        
+        for centroid in init_centroids: 
+            for index, dataPoint in enumerate(list):
+                if(np.array_equal(centroid,dataPoint)):
+                    print(index)
+                    centroidIndices.append(index)
+                    
+        print(centroidIndices)
+        
+        c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
+        
+        for u in c:
+            formatted = [ '%.4f' % elem for elem in u ]
+            print(','.join(formatted))
+        
+    except:
+        print("An Error Has Occurred")
+        exit()
         
