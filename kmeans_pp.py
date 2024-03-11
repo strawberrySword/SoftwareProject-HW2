@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import sys
 import kmeans
+
 def kMeans_pp(dataPoints, k, epsilon, iter=300 ):
-    
-    
     dataPoints_array = np.array(dataPoints)
     centroids = []
     n = len(dataPoints_array)
     
     distances = np.zeros(n)
+    np.random.seed(0)
     centroids.append(dataPoints_array[np.random.choice(n)].copy())
     
     for _ in range(k-1):
@@ -63,19 +63,18 @@ def parseArgs(args):
     df1.set_index(0, inplace=True)
     df2.set_index(0, inplace=True)
     final_filepath = df1.join(df2, how='inner', lsuffix='_file1', rsuffix='_file2')
-    index_list =final_filepath.index.tolist()
-    print(final_filepath)
+
     list = final_filepath.to_numpy()
     
-    print(index_list)
+    index_list = final_filepath.index.tolist()
+    index_list.sort()
     final_filepath.reset_index(inplace=True)
     final_filepath = final_filepath.sort_values(by=final_filepath.columns[0])
     final_filepath = final_filepath.drop(final_filepath.columns[0], axis=1)
     final_filepath = final_filepath.reset_index(drop=True)
-    print(final_filepath)
+
     list = final_filepath.to_numpy()
     
-    print(index_list)
     if(len(list)==0):
         print("An Error Has Occurred")
         exit()    
@@ -88,19 +87,30 @@ def parseArgs(args):
         print("Invalid number of clusters!")    
         exit()
    
-    return k, iter,list,epsilon, filePath1,filePath2
+    return k, iter, list, index_list, epsilon, filePath1, filePath2
 
 if __name__ == '__main__':
-    k,iter,list,epsilon, filePath1,filePath2, = parseArgs(sys.argv)
-    try:
-        init_centroids = kMeans_pp(list, k,epsilon, iter)
-        dataPoints_array = list.tolist()
-        c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
-        
-        for u in c:
-            formatted = [ '%.4f' % elem for elem in u ]
-            print(','.join(formatted))
-    except:
-        print("An Error Has Occurred")
-        exit()
+    k, iter, list, index_list, epsilon, filePath1, filePath2 = parseArgs(sys.argv)
+    # try:
+    init_centroids = kMeans_pp(list, k, epsilon, iter)
+    dataPoints_array = list.tolist()
+    # print(index_list)
+    
+    centroidIndices = []
+    
+    for centroid in init_centroids: 
+        for index, dataPoint in enumerate(list):
+            if(np.array_equal(centroid,dataPoint)):
+                print(index)
+                centroidIndices.append(index)
+                
+    print(centroidIndices)
+    c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
+    
+    for u in c:
+        formatted = [ '%.4f' % elem for elem in u ]
+        print(','.join(formatted))
+    # except:
+    print("An Error Has Occurred")
+    exit()
         
