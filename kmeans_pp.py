@@ -78,14 +78,12 @@ def parseArgs(args):
     final_filepath = df1.join(df2, how='inner', lsuffix='_file1', rsuffix='_file2')
 
     list = final_filepath.to_numpy()
-    
     index_list = final_filepath.index.tolist()
     index_list.sort()
     final_filepath.reset_index(inplace=True)
     final_filepath = final_filepath.sort_values(by=final_filepath.columns[0])
     final_filepath = final_filepath.drop(final_filepath.columns[0], axis=1)
     final_filepath = final_filepath.reset_index(drop=True)
-
     list = final_filepath.to_numpy()
     
     if(len(list)==0):
@@ -112,13 +110,14 @@ if __name__ == '__main__':
         for centroid in init_centroids: 
             for index, dataPoint in enumerate(list):
                 if(np.array_equal(centroid,dataPoint)):
-                    print(index)
                     centroidIndices.append(index)
                     
-        print(centroidIndices)
+       
         
         c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
         
+        print(','.join(map(str,centroidIndices)))
+            
         for u in c:
             formatted = [ '%.4f' % elem for elem in u ]
             print(','.join(formatted))
