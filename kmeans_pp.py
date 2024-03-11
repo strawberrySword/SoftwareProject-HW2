@@ -67,7 +67,10 @@ def parseArgs(args):
     final_filepath = final_filepath.sort_values(by=final_filepath.columns[0])
     final_filepath = final_filepath.drop(final_filepath.columns[0], axis=1)
     final_filepath = final_filepath.reset_index(drop=True)
+    print(final_filepath)
     list = final_filepath.to_numpy()
+    index_list =final_filepath.index.tolist()
+    print(index_list)
     if(len(list)==0):
         print("An Error Has Occurred")
         exit()    
