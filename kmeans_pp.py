@@ -23,10 +23,10 @@ def kMeans_pp(dataPoints, k, epsilon, iter=300 ):
         centroids.append(dataPoints_array[next_centroid].copy())
     
     centroids_array = np.array(centroids)
-    centroids_array = centroids_array.tolist()
-    dataPoints_array = dataPoints_array.tolist()
-    c = kmeans.fit(centroids_array, dataPoints_array, iter, epsilon)
-    print(c)
+    centroids_array = centroids_array.tolist() 
+    
+    return centroids_array
+   
         
 
 def findClosestCenter(datapoint, centroids):
@@ -63,13 +63,18 @@ def parseArgs(args):
     df1.set_index(0, inplace=True)
     df2.set_index(0, inplace=True)
     final_filepath = df1.join(df2, how='inner', lsuffix='_file1', rsuffix='_file2')
+    index_list =final_filepath.index.tolist()
+    print(final_filepath)
+    list = final_filepath.to_numpy()
+    
+    print(index_list)
     final_filepath.reset_index(inplace=True)
     final_filepath = final_filepath.sort_values(by=final_filepath.columns[0])
     final_filepath = final_filepath.drop(final_filepath.columns[0], axis=1)
     final_filepath = final_filepath.reset_index(drop=True)
     print(final_filepath)
     list = final_filepath.to_numpy()
-    index_list =final_filepath.index.tolist()
+    
     print(index_list)
     if(len(list)==0):
         print("An Error Has Occurred")
@@ -88,7 +93,13 @@ def parseArgs(args):
 if __name__ == '__main__':
     k,iter,list,epsilon, filePath1,filePath2, = parseArgs(sys.argv)
     try:
-        kMeans_pp(list, k,epsilon, iter)
+        init_centroids = kMeans_pp(list, k,epsilon, iter)
+        dataPoints_array = list.tolist()
+        c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
+        
+        for u in c:
+            formatted = [ '%.4f' % elem for elem in u ]
+            print(','.join(formatted))
     except:
         print("An Error Has Occurred")
         exit()
