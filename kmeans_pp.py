@@ -73,18 +73,14 @@ def parseArgs(args):
         
     df1 = pd.read_csv(filePath1, header=None)
     df2 = pd.read_csv(filePath2, header=None)
-    df1.set_index(0, inplace=True)
-    df2.set_index(0, inplace=True)
-    final_filepath = df1.join(df2, how='inner', lsuffix='_file1', rsuffix='_file2')
-
-    list = final_filepath.to_numpy()
-    index_list = final_filepath.index.tolist()
+    final_filepath = pd.merge(df1,df2, how='inner', on=0)
+    index_list = final_filepath[0].tolist()
     index_list.sort()
-    final_filepath.reset_index(inplace=True)
-    final_filepath = final_filepath.sort_values(by=final_filepath.columns[0])
-    final_filepath = final_filepath.drop(final_filepath.columns[0], axis=1)
-    final_filepath = final_filepath.reset_index(drop=True)
+    final_filepath = final_filepath.sort_values(by = 0) 
+    final_filepath = final_filepath.loc[: , '1_x':]
     list = final_filepath.to_numpy()
+    
+    
     
     if(len(list)==0):
         print("An Error Has Occurred")
