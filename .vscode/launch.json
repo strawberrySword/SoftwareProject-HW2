@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/misha/Desktop/C projects/SoftwareProject-HW2",
-      "program": "c:/Users/misha/Desktop/C projects/SoftwareProject-HW2/build/Debug/outDebug",
+      "cwd": "c:/Users/dev/Desktop/Learning/SoftwareProject-HW2",
+      "program": "c:/Users/dev/Desktop/Learning/SoftwareProject-HW2/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

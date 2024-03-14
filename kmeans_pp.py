@@ -24,9 +24,7 @@ def kMeans_pp(dataPoints, k, epsilon, iter=300 ):
     centroids_array = np.array(centroids)
     centroids_array = centroids_array.tolist() 
     
-    return centroids_array
-   
-        
+    return centroids_array    
 
 def findClosestCenter(datapoint, centroids):
     minDistance = calcEclideanDistance(centroids, datapoint)
@@ -70,7 +68,15 @@ def parseArgs(args):
         except: 
             print("Invalid epsilon!")
             exit()
-        
+    try:
+        k = int(args[1]) 
+    except:
+        print("Invalid number of clusters!")    
+        exit()
+   
+    return k, iter, epsilon, filePath1, filePath2
+
+def parseFiles(filePath1, filePath2, k):
     df1 = pd.read_csv(filePath1, header=None)
     df2 = pd.read_csv(filePath2, header=None)
     final_filepath = pd.merge(df1,df2, how='inner', on=0)
@@ -79,25 +85,21 @@ def parseArgs(args):
     final_filepath = final_filepath.sort_values(by = 0) 
     final_filepath = final_filepath.loc[: , '1_x':]
     list = final_filepath.to_numpy()
-    
-    
-    
+     
     if(len(list)==0):
         print("An Error Has Occurred")
         exit()    
+        
+    if(k < 2 or k >= len(list)):
+        print("Invalid number of clusters!")
+        exit()   
     
-    try:
-        k = int(args[1])
-        if(k < 2 or k > len(list)):
-            exit()    
-    except:
-        print("Invalid number of clusters!")    
-        exit()
-   
-    return k, iter, list, index_list, epsilon, filePath1, filePath2
+    return list, index_list
 
 if __name__ == '__main__':
-    k, iter, list, index_list, epsilon, filePath1, filePath2 = parseArgs(sys.argv)
+    k, iter, epsilon, filePath1, filePath2 = parseArgs(sys.argv)
+    list, index_list = parseFiles(filePath1, filePath2, k)
+    
     try:
         init_centroids = kMeans_pp(list, k, epsilon, iter)
         dataPoints_array = list.tolist()     
@@ -107,10 +109,8 @@ if __name__ == '__main__':
             for index, dataPoint in enumerate(list):
                 if(np.array_equal(centroid,dataPoint)):
                     centroidIndices.append(index)
-                    
-       
         
-        c= kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
+        c = kmeans.fit(init_centroids, dataPoints_array, iter, epsilon)
         
         print(','.join(map(str,centroidIndices)))
             

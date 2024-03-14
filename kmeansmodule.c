@@ -1,8 +1,9 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define PY_SIZE_T_CLEAN
-#include <Python.h>
 
 typedef struct
 {
@@ -126,9 +127,9 @@ static PyObject *find_kmeans(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    n = PyObject_Length(datapointsLst);
-    k = PyObject_Length(centroidsLst);
-    d = PyObject_Length(PyList_GetItem(datapointsLst, 0));
+    n = (int)PyObject_Length(datapointsLst);
+    k = (int)PyObject_Length(centroidsLst);
+    d = (int)PyObject_Length(PyList_GetItem(datapointsLst, 0));
 
     centroids = calloc(k, sizeof(Centroid));
     dataPoints = (double **)calloc(n, sizeof(double *));
@@ -204,6 +205,9 @@ FREE:
     }
     free(dataPoints);
 
+    if (returnValue == 1){
+        return NULL;
+    }
     return centroidsLst;
 }
 
@@ -211,7 +215,7 @@ static PyMethodDef kmeansMethods[] = {
     {"fit",
      (PyCFunction)find_kmeans,
      METH_VARARGS,
-     PyDoc_STR("find k means for set of datapoints. pass- iter: maximum iterations, e: accaptable accuracy for the means. centroids: array of initialized centroids, dataPoints: array of datapoints ")},
+     PyDoc_STR("find k means for set of datapoints. pass- centroids: array of initialized centroids, dataPoints: array of datapoints iter: maximum iterations, e: accaptable accuracy for the means.")},
     {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef kmeansmodule = {
